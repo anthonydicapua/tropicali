@@ -79,6 +79,10 @@ header {
     margin: 20px 0 20px 0;
 }
 
+.grid img {
+    width: 100%;
+}
+
 .button {
     display: inline-block;
     color: var(--text-on-dark);
