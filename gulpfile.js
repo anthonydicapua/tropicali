@@ -1,16 +1,31 @@
 var gulp = require("gulp")
-var sass = require("gulp-sass")
 var cleanCss = require("gulp-clean-css")
+var postcss = require("gulp-postcss")
 var sourcemaps = require("gulp-sourcemaps")
 var browserSync = require('browser-sync').create()
 var imagemin = require('gulp-imagemin')
+var ghpages = require("gh-pages")
+var concat = require("gulp-concat")
 
-var runSass = function () {
-  // we want to run "sass css/app/scss app.css --watch"
-  return gulp.src("src/css/app.scss")
+var runCss = function () {
+ 
+  return gulp.src([
+      "src/css/reset.css",
+      "src/css/typography.css",
+      "src/css/app.css"
+      ])
       .pipe(sourcemaps.init())
-      .pipe(sass())
       .pipe(
+          postcss([
+              require("autoprefixer"),
+              require("postcss-preset-env")({
+                  stage: 1,
+                  browsers: ["IE 11", "last 2 versions"]
+              })
+          ])
+          )
+       .pipe(concat("app.css"))
+       .pipe(
           cleanCss({
               compatibility: 'ie8'
           })
@@ -29,7 +44,7 @@ var live = function () {
     gulp.watch("src/*.html", html)
         .on('change', browserSync.reload)
 
-    gulp.watch("src/css/*.scss", runSass)
+    gulp.watch("src/css/*.css", runCss)
 }
 
 var html = function () {
@@ -49,7 +64,9 @@ gulp.task("images", function () {
 })
 
 
+gulp.task("deploy", async function () {
+    ghpages.publish("dist")
+})
 
-
-exports.sass = runSass
-exports.default = gulp.series(html, runSass, ["fonts"], ["images"], live)
+exports.sass = runCss
+exports.default = gulp.series(html, runCss, ["fonts"], ["images"], live)
