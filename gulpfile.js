@@ -4,6 +4,7 @@ var cleanCss = require("gulp-clean-css")
 var sourcemaps = require("gulp-sourcemaps")
 var browserSync = require('browser-sync').create()
 var imagemin = require('gulp-imagemin')
+var ghpages = require("gh-pages")
 
 var runSass = function () {
   // we want to run "sass css/app/scss app.css --watch"
@@ -49,7 +50,9 @@ gulp.task("images", function () {
 })
 
 
-
+gulp.task("deploy", async function () {
+    ghpages.publish("dist")
+})
 
 exports.sass = runSass
 exports.default = gulp.series(html, runSass, ["fonts"], ["images"], live)
